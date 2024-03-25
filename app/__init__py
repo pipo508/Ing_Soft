@@ -1,0 +1,40 @@
+import os
+from flask import Flask
+from dotenv import load_dotenv
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
+
+# Inicializar la extensión SQLAlchemy
+db = SQLAlchemy()
+
+def create_app():
+    app = Flask(__name__)
+
+    # Cargar variables de entorno desde el archivo .env
+    load_dotenv()
+
+    # Configuración de la base de datos PostgreSQL.
+    db_parameters = {
+        "user": os.getenv('DB_USER'),
+        "password": os.getenv('DB_PASSWORD'),
+        "host": os.getenv('DB_HOST', 'localhost'),
+        "port": os.getenv('DB_PORT', '5432'),
+        "dbname": os.getenv('DB_NAME')
+    }
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{db_parameters['user']}:{db_parameters['password']}@{db_parameters['host']}:{db_parameters['port']}/{db_parameters['dbname']}"
+
+    # Inicializar la extensión SQLAlchemy con la aplicación Flask
+    db.init_app(app)
+
+    # Inicializar la extensión Flask-Migrate
+    migrate = Migrate(app, db)
+
+    # Importar y registrar los controladores de las rutas   
+
+    # Contexto del shell para interactuar con la aplicación durante el shell interactivo
+    @app.shell_context_processor
+    def ctx():
+        return {"app": app, "db": db}
+
+    return app
