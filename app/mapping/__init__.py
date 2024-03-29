@@ -1,0 +1,1 @@
+from app.mapping.user_schema import UserSchema

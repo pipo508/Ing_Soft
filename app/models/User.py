@@ -1,13 +1,11 @@
-from dataclasses import dataclass
-from app import db 
+from app import db
 from sqlalchemy import Column, Integer, String
-
+from dataclasses import dataclass
 @dataclass
-class User:
+class User(db.Model):
     __tablename__ = "users"
-    id = Column(Integer, primary_key=True)
-    username = Column(String(80), unique=True, nullable=False)
-    def __init__ (self, username):
-            self.id = id
-            self.username = username
-            
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name: str = Column(String(50), nullable=False)
+    dni: str = Column(String(50), nullable=False)
+    
+    

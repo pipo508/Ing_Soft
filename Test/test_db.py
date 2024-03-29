@@ -1,21 +1,22 @@
 import unittest
-from flask import current_app
+from sqlalchemy import text
 from app import create_app, db
-from sqlalchemy import text  # Importar text desde SQLAlchemy
 
 class AppTestCase(unittest.TestCase):
     def setUp(self):
         self.app = create_app()
-        self.app_context = self.app.app_context()
-        self.app_context.push()
+        self.client = self.app.test_client()
+        self.db = db
 
     def tearDown(self):
-        self.app_context.pop()
+        with self.app.app_context():
+            self.db.session.remove()
+            self.db.drop_all()
 
     def test_db_connection(self):
         with self.app.app_context():
             # Utilizar text() para declarar la expresión SQL
-            result = db.session.execute(text("SELECT 'Hello World'")).scalar()
+            result = self.db.session.execute(text("SELECT 'Hello World'")).scalar()
             self.assertEqual(result, "Hello World")
 
 if __name__ == "__main__":
